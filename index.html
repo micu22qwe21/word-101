@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>101병동 업무일지</title>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px;background:#fff;color:#111}
@@ -46,15 +49,10 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px
 .co-btn:hover{background:#F4C0D1}.co-btn.primary:hover{background:#993556}
 .main{display:flex}
 .sidebar{width:200px;border-right:1px solid #e5e5e5;flex-shrink:0}
-/* 이번달 할일 — 붉은색 */
 .ss-month-todo{padding:10px 12px;border-bottom:2px solid #EF9A9A;background:#FFF5F5}
-/* 매달 루틴 */
 .ss-routine{padding:10px 12px;border-bottom:2px solid #F4C0D1;background:#fff8fa}
-/* 리마인더 — 주황 */
 .ss-remind{padding:10px 12px;border-bottom:2px solid #FFB74D;background:#FFF8F0}
-/* 추후 할일 */
 .ss-todo{padding:10px 12px;border-bottom:2px solid #1565C0;background:#E3F2FD}
-/* 고정 */
 .ss-fixed{padding:10px 12px;border-bottom:2px solid #1B5E20;background:#E8F5E9}
 .ss{padding:10px 12px;border-bottom:1px solid #e5e5e5}
 .st{font-size:11px;font-weight:700;letter-spacing:0.04em;margin-bottom:8px;display:flex;align-items:center;gap:5px;color:#111}
@@ -72,7 +70,6 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px
 .radd input{flex:1;border:1px solid #e0e0e0;border-radius:5px;padding:4px 6px;font-size:11px;color:#333;background:#fff;font-family:inherit}
 .radd input:focus{outline:none}
 .radd button{background:none;border:1px solid #ddd;border-radius:5px;width:22px;height:22px;cursor:pointer;color:#888;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-/* 리마인더 카드 — 주황 */
 .remind-item{border-radius:6px;padding:7px 9px;margin-bottom:5px;position:relative;border:1px solid #FFB74D;background:#FFF3E0}
 .remind-item.pinned{border-left:3px solid #E65100;padding-left:7px}
 .remind-item.drag-over{border-top:2px solid #E65100}
@@ -89,7 +86,6 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px
 .cat-name-input:focus{outline:none}
 .ic-btn{background:none;border:none;cursor:pointer;color:#bbb;font-size:12px;padding:0;display:flex;align-items:center}
 .ic-btn:hover{color:#666}
-/* 캘린더 */
 .cal-wrap{flex:1;overflow-x:hidden}
 .cal-header{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid #e5e5e5;position:sticky;top:0;background:#fff;z-index:10}
 .cal-hd{text-align:center;padding:7px 4px;font-size:11px;font-weight:700;color:#555}
@@ -102,7 +98,6 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px
 .day-num{font-size:13.5px;font-weight:700;color:#111;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin-bottom:3px}
 .day-num.sun{color:#C0392B}.day-num.sat{color:#1A5276}
 .cal-cell.today .day-num.sun,.cal-cell.today .day-num.sat{color:#fff}
-/* 캘린더 태그 — 순서변경 화살표 포함 */
 .ctag-wrap{position:relative;display:flex;align-items:center;gap:2px;margin-bottom:2px}
 .ctag{flex:1;font-size:11.5px;font-weight:600;padding:2px 5px;border-radius:3px;line-height:1.4;word-break:keep-all;cursor:pointer}
 .ctag.done{text-decoration:line-through;opacity:0.45}
@@ -114,7 +109,6 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px
 .cal-order-btn:hover{background:#e0e0e0}
 .cal-order-btn:disabled{opacity:0.3;cursor:default}
 .cal-img-thumb{width:100%;max-height:40px;object-fit:cover;border-radius:3px;margin-top:2px;display:block}
-/* 다이어리 */
 .diary-page{padding:16px}
 .diary-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
 .diary-nav-wrap{display:flex;align-items:center;gap:8px}
@@ -145,7 +139,6 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px
 .img-drop:hover,.img-drop.drag{border-color:#378ADD;color:#378ADD}
 .img-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .img-preview{max-width:100%;max-height:150px;border-radius:6px;margin-top:8px;display:none}
-/* 모달 */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:100;align-items:flex-start;justify-content:center;padding-top:40px}
 .modal-overlay.open{display:flex}
 .modal{background:#fff;border-radius:12px;border:1px solid #e5e5e5;width:520px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.15)}
@@ -171,7 +164,6 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
 .ebtn{background:none;border:1px solid #e0e0e0;border-radius:4px;cursor:pointer;color:#888;font-size:11px;padding:2px 5px;line-height:1}
 .ebtn:hover{background:#e0e0e0;color:#333}
 .ebtn.del:hover{background:#FBEAF0;color:#E24B4A;border-color:#F4C0D1}
-.repeat-badge{font-size:9px;background:#F3E5F5;color:#7B1FA2;border-radius:3px;padding:1px 4px;margin-left:3px;font-weight:600}
 .add-row{display:flex;gap:6px}
 .add-row input{flex:1;border:1px solid #e0e0e0;border-radius:6px;padding:7px 10px;font-size:13px;color:#333;background:#fff;font-family:inherit}
 .add-row input:focus{outline:none}
@@ -185,6 +177,11 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
 .entry-edit-btns{display:flex;gap:5px;margin-top:4px}
 .entry-edit-save{background:#D4537E;border:none;border-radius:4px;padding:3px 10px;font-size:11px;color:#fff;cursor:pointer}
 .entry-edit-cancel{background:none;border:1px solid #ddd;border-radius:4px;padding:3px 10px;font-size:11px;color:#666;cursor:pointer}
+/* 동기화 상태 표시 */
+.sync-status{font-size:10px;padding:2px 8px;border-radius:10px;margin-left:8px}
+.sync-status.synced{background:#E8F5E9;color:#2E7D32}
+.sync-status.syncing{background:#FFF8E1;color:#F57F17}
+.sync-status.error{background:#FFEBEE;color:#C62828}
 </style>
 </head>
 <body>
@@ -192,6 +189,7 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
 <div class="topbar">
   <div class="topbar-left">
     <span class="topbar-title" id="topbar-title">-- 업무일지</span>
+    <span class="sync-status syncing" id="sync-status">⏳ 연결중...</span>
     <div class="nav-wrap" id="cal-nav">
       <button class="nbtn" onclick="changeMonth(-1)">&#8249;</button>
       <span class="month-chip" id="month-chip">--</span>
@@ -208,7 +206,6 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
       <button class="tab-btn active-cal" id="tab-cal" onclick="switchPage('cal')"><span class="tab-dot" style="background:#D4537E"></span>업무일지</button>
       <button class="tab-btn" id="tab-diary" onclick="switchPage('diary')"><span class="tab-dot" style="background:#378ADD"></span>다이어리</button>
     </div>
-
   </div>
 </div>
 
@@ -225,8 +222,6 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
   </div>
   <div class="main">
     <div class="sidebar">
-
-      <!-- 이번달 할일 — 붉은색 -->
       <div class="ss-month-todo">
         <div class="st" style="color:#B71C1C;font-size:12px;font-weight:800">📋 이번달 할 일<span class="st-badge" id="mtodo-badge">0</span></div>
         <div id="mtodo-list"></div>
@@ -235,8 +230,6 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
           <button onclick="addMTodo()" style="border-color:#EF9A9A;color:#C62828">+</button>
         </div>
       </div>
-
-      <!-- 매달 루틴 -->
       <div class="ss-routine">
         <div class="st" style="color:#993556;font-size:12px;font-weight:800">🔁 매달 루틴<span class="st-badge" id="routine-badge">0</span></div>
         <div id="routine-list"></div>
@@ -245,8 +238,6 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
           <button onclick="addRoutine()" style="border-color:#F4C0D1;color:#D4537E">+</button>
         </div>
       </div>
-
-      <!-- 리마인더 — 주황 -->
       <div class="ss-remind">
         <div class="st" style="color:#BF360C;font-size:12px;font-weight:800">🔔 리마인더<span class="st-badge" id="remind-badge">0</span></div>
         <div id="remind-list"></div>
@@ -255,8 +246,6 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
           <button onclick="addRemind()" style="border-color:#FFB74D;color:#E65100">+</button>
         </div>
       </div>
-
-      <!-- 추후 할 일 -->
       <div class="ss-todo">
         <div class="st" style="color:#0D47A1;font-size:12px;font-weight:800">✅ 추후 할 일<span class="st-badge" id="todo-badge">0</span></div>
         <div id="todo-list"></div>
@@ -265,8 +254,6 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
           <button onclick="addTodo()" style="border-color:#B5D4F4;color:#378ADD">+</button>
         </div>
       </div>
-
-      <!-- 고정 -->
       <div class="ss-fixed">
         <div class="st" style="color:#1B5E20;font-size:12px;font-weight:800">📌 고정</div>
         <div id="fixed-list"></div>
@@ -275,8 +262,6 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
           <button onclick="addFixed()" style="border-color:#81C784;color:#2E7D32">+</button>
         </div>
       </div>
-
-      <!-- 카테고리 -->
       <div class="ss">
         <div class="st">🎨 카테고리 <span style="font-size:10px;font-weight:400">(이름 클릭=편집)</span></div>
         <div id="cat-list"></div>
@@ -287,7 +272,6 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
         </div>
       </div>
     </div>
-
     <div class="cal-wrap">
       <div class="cal-header">
         <div class="cal-hd sun">일</div><div class="cal-hd">월</div><div class="cal-hd">화</div>
@@ -298,7 +282,6 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
   </div>
 </div>
 
-<!-- 다이어리 페이지 -->
 <div class="page" id="page-diary">
   <div class="diary-page">
     <div class="diary-topbar">
@@ -409,6 +392,80 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
 </div>
 
 <script>
+// ========== Firebase 설정 ==========
+const firebaseConfig = {
+  apiKey: "AIzaSyDkG0cyu7_0Jh1uTSkyediGcVxsycpyZ1k",
+  authDomain: "ward-101-note.firebaseapp.com",
+  databaseURL: "https://ward-101-note-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ward-101-note",
+  storageBucket: "ward-101-note.firebasestorage.app",
+  messagingSenderId: "937011992239",
+  appId: "1:937011992239:web:84a03a65365b014d48a65a"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ========== 기존 데이터 마이그레이션 ==========
+var MIGRATION_DATA = {"routines_101v2": [{"text": "에너지 절약", "done": true}, {"text": "해피콜", "done": true}, {"text": "1일 10시. 사후(아트모스, 큐라박캐니스터)", "done": true}, {"text": "월보고", "done": true}, {"text": "업무원 리스트, 마약 출력, 커튼 신청", "done": true}, {"text": "수액, 비치, 의료장비", "done": true}, {"text": "사. 소. 인", "done": true}, {"text": "4일까지 꿈꾸러미- 지주영", "done": true}, {"text": "짝수 1일 : 리퀘스트 마감. -번표 전달", "done": false}, {"text": "20일: 듀티 완성. 부서원 점검  25일까지 확정", "done": false}], "je_2026-06-19": [{"text": "휴가", "catId": "c6", "done": false, "img": null}, {"text": "이브닝전-유리,예린 중환자교육", "catId": "c1", "done": false, "img": null}], "je_2026-06-18": [{"text": "반차", "catId": "c6", "done": false, "img": null}, {"text": "신규수간호사 회식", "catId": "c2", "done": false, "img": null}, {"text": "12시. 줌교육-AI", "catId": "c3", "done": false, "img": null}], "je_2026-06-01": [], "je_2026-06-10": [{"text": "3차 논문 과제 제출", "catId": "c3", "done": true, "img": null}, {"text": "11시 09분 이비인후과", "catId": "c6", "done": true, "img": null}, {"text": "acls 설문 보내기", "catId": "c2", "done": true, "img": null}, {"text": "신규 이경은", "catId": "c4", "done": true, "img": null}, {"text": "icu단톡. 데이터 수집.", "catId": "c3", "done": false, "img": null}, {"text": "RPA 체중 리스트", "catId": "c2", "done": false, "img": null}], "je_2026-06-04": [{"text": "IRB 교육 이수확인", "catId": "c2", "done": true, "img": null}, {"text": "qi 개선활동 생각..", "catId": "c2", "done": true, "img": null}, {"text": "2시 교육위원회 회의", "catId": "c3", "done": true, "img": null}, {"text": "1시 50분 ACLS", "catId": "c3", "done": true, "img": null}, {"text": "3시 20분 ACLS", "catId": "c3", "done": true, "img": null}, {"text": "무전기 -A팀, B팀", "catId": "cat_1780564197879", "done": false, "img": null}, {"text": "이예린 번표-7월, 8월 교육자 근무 확인", "catId": "cat_1780360238270", "done": false, "img": null}], "je_2026-06-02": [{"text": "손지현-연구계획", "catId": "c3", "done": false, "img": null}, {"text": "휘현, 공지은, 하현, 혜정", "catId": "c4", "done": false, "img": null}, {"text": "해피콜", "catId": "c2", "done": true, "img": null}, {"text": "망실-스테플러", "catId": "cat_1780360238270", "done": true, "img": null}, {"text": "세연, 유리 야전 동의서", "catId": "c2", "done": true, "img": null}, {"text": "반차", "catId": "c6", "done": true, "img": null}], "je_2026-06-20": [{"text": "윤소 축의금", "catId": "c6", "done": false, "img": null}], "je_2026-06-17": [{"text": "물품 TFT김승희- 구글시트 올리기", "catId": "c3", "done": false, "img": null}, {"text": "3시 30분 연구 워크샵- 이세연. 신관 10층", "catId": "c3", "done": false, "img": null}], "je_2026-07-08": [{"text": "김혜민. 존중언어 킥오프 3시 30분", "catId": "c1", "done": false, "img": null}], "je_2026-06-11": [{"text": "대본 -3시 30분 NLP 진행", "catId": "c3", "done": true, "img": null}, {"text": "아트모스 1번 고장, 리바트 나사? 연락", "catId": "c2", "done": true, "img": null}, {"text": "김성자연락 업무원- 업무원 안내문정리", "catId": "c2", "done": true, "img": null}, {"text": "보험회사.", "catId": "c2", "done": false, "img": null}], "je_2026-07-01": [{"text": "월보고 시 베스트 널싱 내용 추가", "catId": "c2", "done": false, "img": null}, {"text": "3시. 신관 10층 회의실. ai 교육", "catId": "c3", "done": false, "img": null}], "je_2026-09-23": [{"text": "중대재해 제출", "catId": "c3", "done": false, "img": null}], "je_2026-06-12": [{"text": "논문 : 계획서 -손지현전달, 교육 스크립트-환자교육자료(그림)-동영상-체크리스트: 지식태도 도구와 일치하는지 다시 점검-이세. / 동영상 큐알 넣기, 브로셔 느낌으로 바꾸기. 그림자료 피드백주기. 지식태도 도구에 잘모름? 인식표 어디에 부착할지.", "catId": "c3", "done": false, "img": null}, {"text": "듀티짜기. 7월 8일 김혜민 데이", "catId": "c2", "done": false, "img": null}, {"text": "acls 구글 시트입력. 만족도 설문지 보내기", "catId": "c2", "done": true, "img": null}, {"text": "신규면담 정리", "catId": "c2", "done": true, "img": null}, {"text": "업무언 안내문 출력", "catId": "c2", "done": true, "img": null}, {"text": "반차신청", "catId": "c2", "done": true, "img": null}, {"text": "침상. -환자 이불. 린넨실 차단", "catId": "cat_1780564197879", "done": false, "img": null}], "co_dismissed_2026-6": true, "je_2026-06-08": [{"text": "QI서머리", "catId": "c3", "done": true, "img": null}, {"text": "손지현 1박 2일 교육", "catId": "c1", "done": true, "img": null}, {"text": "모바일 초기평가 응답 조사 시작", "catId": "c3", "done": true, "img": null}, {"text": "김혜정 임명장", "catId": "c5", "done": false, "img": null}, {"text": "3시 30. acls", "catId": "c3", "done": true, "img": null}, {"text": "김경훈 신규 면담", "catId": "c4", "done": true, "img": null}], "je_2026-06-16": [{"text": "10시 30분 수간호사 회의", "catId": "c3", "done": false, "img": null}, {"text": "3시 10분. 환자안전 회의", "catId": "c3", "done": false, "img": null}, {"text": "주말 김혜정 수액 ALL DROP- 투약 보고서 받기.: 면담하기. 면담시 통합간호사(정현숙. 약봉지도함께)", "catId": "cat_1780564197879", "done": false, "img": null}, {"text": "중환자실 공지", "catId": "c3", "done": false, "img": null}], "reminds_101": [{"text": "아빠 내시경 -12월/엄마 PS 눈, 마통", "pinned": false}, {"text": "ca-SO-ho-ba", "pinned": false}, {"text": "섬망-억제대, 낙상난간, 서브 병실 낙상교육", "pinned": false}, {"text": "선미. 주말데이. 월 E안됨", "pinned": false}, {"text": "우러보고시 사직은 보고월, 익월 예정자", "pinned": false}], "je_2026-06-15": [{"text": "3시 30분 ACLS- 평가표 입력. 출석부 체크", "catId": "c3", "done": true, "img": null}, {"text": "모바일 초기평가 응답 제출- 이정은", "catId": "c3", "done": true, "img": null}, {"text": "침상업무원- 2인실 선반", "catId": "c2", "done": false, "img": null}, {"text": "회진게시판, 식판. 스티커 확인", "catId": "c2", "done": true, "img": null}, {"text": "박숙영- ads, 약반납", "catId": "c2", "done": false, "img": null}, {"text": "AI공모전 신청", "catId": "c2", "done": false, "img": null}, {"text": "신규 트레이닝 일정. 간호사 정리", "catId": "c2", "done": false, "img": null}, {"text": "중대재해제출", "catId": "c3", "done": true, "img": null}, {"text": "교육간호사- 타임아웃지 누락 많다", "catId": "cat_1780564197879", "done": false, "img": null}, {"text": "청소업무원- 화장실 세면대에 소변통 씻음. 병실 세면대 음식물 버림. 안내문 게시하기", "catId": "cat_1780564197879", "done": false, "img": null}], "je_2026-06-23": [{"text": "엄빠 외래 정리", "catId": "c2", "done": false, "img": null}], "je_2026-06-26": [{"text": "이브닝전 방서연 호흡기 시뮬 12시 30", "catId": "c1", "done": false, "img": null}], "je_2026-06-25": [{"text": "이경은 점프업 S", "catId": "c1", "done": false, "img": null}], "je_2026-06-22": [{"text": "큐라시스 연락", "catId": "c2", "done": false, "img": null}], "mtodos_2026_5": [{"id": "mt_1780360523794", "text": "환자경험활동 실천-이휘현", "done": false}, {"id": "mt_1780360530191", "text": "입원초기평가0모바일", "done": true}, {"id": "mt_1780360533349", "text": "업무지침 파일", "done": false}, {"id": "mt_1780360541670", "text": "QI 지원금-강민정", "done": true}, {"id": "mt_1780360546170", "text": "무전기 사용", "done": true}, {"id": "mt_1780360559757", "text": "시간될 때 무전기", "done": true}, {"id": "mt_1780360562850", "text": "2인실 가동율", "done": false}], "je_2026-06-29": [{"text": "3시 30분 ACLS 김소현", "catId": "c3", "done": false, "img": null}], "todos_101": [{"text": "7월 간호사 피복 신청", "done": false}, {"text": "니큐-스탠드, 월석", "done": false}, {"text": "네뷸 필터 26.9월", "done": false}], "diaries_101": [{"id": "d_1780629412118", "date": "2026-06-05", "tagId": "t5", "content": "공지은 면담- 데이 근무 중 갑자기 면담 요청함. 3교대 힘들다함. 지금 외래 모집 공고가 떴는데 상근 지원해도 되냐 물어봄. 언제든 지원하도록 함. 사직은 너무 아깝지 않냐. 그랬더니 장기 근속 휴직 6개월 고려한다함. 언제쯤 가능한지 물어봐서.. 9월 쯤이라 대답해줌. 신규 독립하고.  . \n이휘현. 근무 종료 후 연락오는것에 대해 면담함. 별거 아닌거. 예시. 드레인양 왜 아이오용지에 안적었냐. PHIS에 입력해놓았다. 이런거. . 인계 줄때 본인이 기분이 안좋으면 분위기가 안좋다. 불편하다. \n일단. 외래 모집 신청해보고 안되면 장기 근속 휴직 생각한다고 추후 알려주기로 함. 현재 임신도 시도하고 있지만, 안되고 있다함. \n이휘현은 내가 면담 할 계획이 있다. 주의 주겠다하고 끝냄\n🔵 공지은\n면담 경위 : 데이 근무 중 자발적 면담 요청\n주요 내용\n\n3교대 근무 부담 호소\n현재 외래 모집 공고 관련 상근 지원 의향 문의\n사직 대신 장기근속 휴직(6개월) 고려 중\n임신 시도 중이나 현재 미성공 상태\n\n결정사항\n외래 지원 → 자유롭게 진행하도록 안내\n장기근속 휴직 가능 시기 → 9월경 (신규 독립 후) 안내\n외래 결과 확인 후 휴직 여부 추후 통보하기로 함\n추후 수간호사 주도 면담 예정", "img": null}, {"id": "d_1781248320980", "date": "2026-06-08", "tagId": "t5", "content": "김경훈 신규 면담 요약\n📅 시기: 트레이닝 3주차\n업무 적응\n입사 시 특파 희망 → 병동 업무도 만족\n일회성 프리셉터 배정 시 혼자 업무 수행하도록 방치되는 상황 발생\n조치: 2개월까지 밀착 동행 지도하도록 프리셉터에 주의 예정\n생활·건강\n식사·3교대 적응 양호\n여자친구 있음 (1년 반) / 수원 거주, 대구 본가\n부친 일찍 별세 / 외아들 → 어머니께 자주 연락 노력 중\n취미: 홈 근력운동, 야구단 활동\n성격·목표\n무표정이 기본값 → 오해 받지 않으려 웃으려 노력 중 (개선 확인)\n단기 목표: 빠른 업무 적응\n면담 피드백\n독립 걱정 내려놓기\n모를 땐 솔직히 말하고, 혼자 보내질 땐 \"같이 봐주세요\" 적극 요청하도록 안내\n→ 추후 면담 예정", "img": null}, {"id": "d_1781249197750", "date": "2026-06-10", "tagId": "t5", "content": "이경은 신규 면담 요약\n📅 시기: 트레이닝 3주차\n업무 적응\n프리셉터 손지현·김혜민 모두 만족\nC팀 업무 다소 힘들지만 수행 가능\n쉬는 날 자율적으로 업무 공부 중\n조치: 번아웃 예방 위해 과도한 자율학습 지양 안내\n생활·건강\n신체 증상 없음\n운동·취미 없음 / 휴일 수면·유튜브로 소비\n코멘트: 스트레스 해소를 위한 취미 활동 권유\n가족·생활환경\n본가 광명 / 부모님 포천 거주 → 사실상 자취\n17살 차이 언니 있으나 교류 적음\n부모님 방문용으로 최근 차량 구입 (부모님 지원)\n남자친구 없음\n독립 일정\n간호부 정책 기준으로 예정일 설정\n해당 시점 면담 후 연장 가능성 있음을 안내\n→ 추후 면담 예정", "img": null}, {"id": "d_1781249453719", "date": "2026-06-12", "tagId": "t1", "content": "1.할일은 많고. 머리는 복잡하고.. 요즘 타과 입원이 많다. cs가 못채우니. 그런데 가끔 타과 받아놓고 타부서보내는 일이 있어서 그러지 말라고 간호사들에게 말하고는 있지만, 특히 이휘현은 맘에 안들면 환자를 그냥 보낸다. 오늘도 os환자 보내고 또 os환자를 받는다는 그런 얘기가 흘러나오는것 같아서 다시한번 주의 줌-이세연. 그리고 양행진에게도 적당히 알아서 조절해달라고 했음. 2. ADS아침에 오는 남자 업무원컴플레인-이세연. 본인들은 인계받고 라운딩도 돌고 와야하는데 빨리 주사약 챙기라면서 앞에서 기다리고 있다함. (에휴 그냥 주사챙기고 라운딩가면되지.. 뭔... )일단 약제팀 부팀장에게 얘기해놓겠다고 했음. 니미", "img": null}, {"id": "d_1781498626358", "date": "2026-06-15", "tagId": "tag_1781498143615", "content": "아트모스 수술실 연락 시 HN.보고. ACLS설물 내일까지. 모바일조사 안해도됨, 꿈꾸러미", "img": null}], "fixed_101": [{"id": "f_1780353314440", "text": "장미 26..4.24-27.4.23 (3월 복직계 작성)", "done": false}, {"id": "f_1780360277131", "text": "희정, 예린, 선미 - 프셉교육", "done": false}, {"id": "f_1780360289028", "text": "25년 니혼 2대 신청(폐기 아직)", "done": false}, {"id": "f_1780360297057", "text": "25.11 닥터스 3개 데모", "done": false}, {"id": "f_1780360304856", "text": "25. 큐라박 데모 2개", "done": false}, {"id": "f_1780360318396", "text": "25.10 아트모스 2개 신청. 입고(-)", "done": false}], "je_2026-07-28": [{"text": "이휘현 보수교육", "catId": "c1", "done": false, "img": null}], "cats_101": [{"id": "c1", "name": "간호사 교육", "color": "#297500"}, {"id": "c2", "name": "해야할 일", "color": "#343637"}, {"id": "c3", "name": "중요 & 나의 일정", "color": "#f90101"}, {"id": "c4", "name": "면담", "color": "#d98a02"}, {"id": "c5", "name": "팀장 보고", "color": "#1f01fe"}, {"id": "c6", "name": "개인일정", "color": "#04bebb"}, {"id": "cat_1780360238270", "name": "추후 확인", "color": "#f401d3"}, {"id": "cat_1780564197879", "name": "기억", "color": "#ac06f9"}], "je_2026-07-31": [{"text": "보수교육-건대", "catId": "c6", "done": false, "img": null}], "dtags_101": [{"id": "t1", "name": "일반", "color": "#888780"}, {"id": "t2", "name": "간호사", "color": "#D4537E"}, {"id": "t3", "name": "이벤트", "color": "#9B59B6"}, {"id": "t4", "name": "교육", "color": "#378ADD"}, {"id": "t5", "name": "면담", "color": "#1D9E75"}, {"id": "t6", "name": "회의", "color": "#BA7517"}, {"id": "tag_1781498143615", "name": "부서공지", "color": "#dd3636"}], "je_2026-06-24": [{"text": "2시  91병동 ACLS 김소현", "catId": "c3", "done": false, "img": null}], "je_2026-07-16": [{"text": "김경훈 점프업 교육", "catId": "c1", "done": false, "img": null}, {"text": "관리자 교육 (온라인)-교육휴가 내기", "catId": "c3", "done": false, "img": null}], "je_2026-06-09": [{"text": "2팀 회의- 오전 11시. 간호부 회의실", "catId": "c3", "done": true, "img": null}, {"text": "손지현 1박 2일 교육", "catId": "c1", "done": true, "img": null}, {"text": "김경훈 체크리스트 교육9:30-12:30", "catId": "c1", "done": true, "img": null}, {"text": "6/18, 19 휴가", "catId": "c5", "done": true, "img": null}, {"text": "강민정 -25만원qi지원금", "catId": "cat_1780564197879", "done": true, "img": null}], "je_2026-07-03": [{"text": "2시  91병동 ACLS 장미선", "catId": "c3", "done": false, "img": null}, {"text": "3시 30분 91병동 ACLS 장미선", "catId": "c3", "done": false, "img": null}], "je_2026-06-05": [{"text": "경험평가 인쇄물-구글", "catId": "c2", "done": true, "img": null}, {"text": "신규면담정리, 스케줄 독립, 비상연락망", "catId": "c2", "done": false, "img": null}, {"text": "반차-김보민, 송윤선", "catId": "c6", "done": true, "img": null}, {"text": "PS 외래 6/24 변경", "catId": "c6", "done": true, "img": null}, {"text": "무전기 신청", "catId": "c2", "done": true, "img": null}, {"text": "김하현 프셉신청", "catId": "cat_1780360238270", "done": true, "img": null}, {"text": "공지 2", "catId": "c2", "done": false, "img": null}, {"text": "공지은- 내용은 다이어리", "catId": "c4", "done": true, "img": null}]};
+
+function runMigration() {
+  db.ref('ward101').once('value', function(snapshot) {
+    var existing = snapshot.val();
+    // Firebase가 비어있을 때만 마이그레이션 실행
+    if (!existing || Object.keys(existing).length === 0) {
+      db.ref('ward101').set(MIGRATION_DATA).then(function() {
+        console.log('기존 데이터 마이그레이션 완료!');
+      });
+    }
+  });
+}
+
+// 마이그레이션 실행
+runMigration();
+
+// 동기화 상태 표시
+function setSyncStatus(state) {
+  var el = document.getElementById('sync-status');
+  if (state === 'synced') { el.textContent = '✅ 동기화됨'; el.className = 'sync-status synced'; }
+  else if (state === 'syncing') { el.textContent = '⏳ 저장중...'; el.className = 'sync-status syncing'; }
+  else { el.textContent = '❌ 오류'; el.className = 'sync-status error'; }
+}
+
+// ========== 저장/불러오기 (Firebase + localStorage 동시 사용) ==========
+var cache = {};
+var dbReady = false;
+
+// Firebase에서 전체 데이터 한 번에 불러오기
+db.ref('ward101').on('value', function(snapshot) {
+  var data = snapshot.val() || {};
+  cache = data;
+  dbReady = true;
+  setSyncStatus('synced');
+  render();
+}, function(error) {
+  setSyncStatus('error');
+  // Firebase 오류시 localStorage로 폴백
+  dbReady = true;
+  render();
+});
+
+function ld(k, def) {
+  if (cache[k] !== undefined) return JSON.parse(JSON.stringify(cache[k]));
+  try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch(e) { return def; }
+}
+
+function sv(k, v) {
+  cache[k] = v;
+  setSyncStatus('syncing');
+  db.ref('ward101/' + k).set(v).then(function() {
+    setSyncStatus('synced');
+  }).catch(function() {
+    setSyncStatus('error');
+  });
+  try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {}
+}
+
+// ========== 이하 기존 코드 동일 ==========
 var DAYS=['일','월','화','수','목','금','토'];
 var MONTHS=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 var curYear=new Date().getFullYear(), curMonth=new Date().getMonth();
@@ -425,8 +482,6 @@ var DEFAULT_TAGS=[{id:'t1',name:'일반',color:'#888780'},{id:'t2',name:'간호�
 var DEFAULT_ROUTINES=[{text:'월별 간호사 성과 확인',done:false},{text:'매달 물품 점검',done:false},{text:'월초 근무표 확정',done:false},{text:'월말 보고서 작성',done:false}];
 
 function dk(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
-function ld(k,def){try{var v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
-function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 function getEntries(key){return ld('je_'+key,[]);}
 function saveEntries(key,arr){sv('je_'+key,arr);}
 function getCats(){return ld('cats_101',DEFAULT_CATS);}
@@ -449,7 +504,6 @@ function saveRepeatRules(a){sv('repeat_rules_101',a);}
 function getCatById(id){var c=getCats().find(function(x){return x.id===id;});return c||{name:'기타',color:'#888780'};}
 function getMTodos(){return ld('mtodos_'+curYear+'_'+curMonth,[]);}
 function saveMTodos(a){sv('mtodos_'+curYear+'_'+curMonth,a);}
-
 function hex2rgba(hex,a){if(!hex||hex.length<7)return 'rgba(136,135,128,'+a+')';var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return 'rgba('+r+','+g+','+b+','+a+')';}
 
 function switchPage(page){
@@ -470,7 +524,6 @@ function changeMonth(d){curMonth+=d;if(curMonth<0){curMonth=11;curYear--;}if(cur
 function changeDiaryMonth(d){diaryMonth+=d;if(diaryMonth<0){diaryMonth=11;diaryYear--;}if(diaryMonth>11){diaryMonth=0;diaryYear++;}updateTitle();renderDiaryList();}
 function render(){updateTitle();applyRepeatRules(curYear,curMonth);renderCal();renderMTodos();renderRoutines();renderReminds();renderTodoList();renderFixed();renderCatList();renderCatSelect();checkCarryover();}
 
-/* 반복 규칙 */
 function applyRepeatRules(y,m){
   var rules=getRepeatRules();
   rules.forEach(function(rule){
@@ -490,7 +543,6 @@ function applyRepeatRules(y,m){
   });
 }
 
-/* 이번달 할 일 */
 function renderMTodos(){
   var items=getMTodos();
   var remain=items.filter(function(t){return !t.done;}).length;
@@ -501,12 +553,12 @@ function renderMTodos(){
     var isEdit=editingMTodoId===item.id;
     var content=isEdit
       ?'<div style="flex:1"><input id="mtedit_'+item.id+'" value="'+item.text.replace(/"/g,'&quot;')+'" onblur="saveMTodoEdit(\''+item.id+'\')" onkeydown="if(event.key===\'Enter\')saveMTodoEdit(\''+item.id+'\')" style="width:100%;border:1px solid #EF9A9A;border-radius:3px;padding:2px 5px;font-size:12px;font-family:inherit;color:#B71C1C"></div>'
-      :        '<span style="flex:1;font-size:12px;font-weight:800;color:'+(item.done?'#bbb':'#B71C1C')+';'+(item.done?'text-decoration:line-through':'')+';cursor:pointer" ondblclick="startMTodoEdit(\''+item.id+'\')" title="더블클릭=편집">'+item.text+'</span>';
+      :'<span style="flex:1;font-size:12px;font-weight:800;color:'+(item.done?'#bbb':'#B71C1C')+';'+(item.done?'text-decoration:line-through':'')+';cursor:pointer" ondblclick="startMTodoEdit(\''+item.id+'\')" title="더블클릭=편집">'+item.text+'</span>';
     return '<div class="ri">'+
       '<input type="checkbox" '+(item.done?'checked':'')+' onchange="toggleMTodo(\''+item.id+'\')" style="width:12px;height:12px;accent-color:#C62828;flex-shrink:0;margin-top:2px">'+
       content+
-      '<button onclick="startMTodoEdit(\''+item.id+'\')" style="background:none;border:none;cursor:pointer;color:#EF9A9A;font-size:11px;padding:0 2px" title="편집">✏️</button>'+
-      '<button onclick="delMTodo(\''+item.id+'\')" style="background:none;border:none;cursor:pointer;color:#EF9A9A;font-size:11px;padding:0" title="삭제">✕</button>'+
+      '<button onclick="startMTodoEdit(\''+item.id+'\')" style="background:none;border:none;cursor:pointer;color:#EF9A9A;font-size:11px;padding:0 2px">✏️</button>'+
+      '<button onclick="delMTodo(\''+item.id+'\')" style="background:none;border:none;cursor:pointer;color:#EF9A9A;font-size:11px;padding:0">✕</button>'+
     '</div>';
   }).join('');
   if(editingMTodoId){var inp=document.getElementById('mtedit_'+editingMTodoId);if(inp){inp.focus();inp.select();}}
@@ -517,7 +569,6 @@ function delMTodo(id){saveMTodos(getMTodos().filter(function(x){return x.id!==id
 function startMTodoEdit(id){editingMTodoId=id;renderMTodos();}
 function saveMTodoEdit(id){var inp=document.getElementById('mtedit_'+id);if(!inp)return;var v=inp.value.trim();if(v){var items=getMTodos();var i=items.findIndex(function(x){return x.id===id;});if(i>=0)items[i].text=v;saveMTodos(items);}editingMTodoId=null;renderMTodos();}
 
-/* 캘린더 — 셀 내 ▲▼ 순서변경 */
 function renderCal(){
   var grid=document.getElementById('cal-grid');
   var firstDay=new Date(curYear,curMonth,1).getDay();
@@ -541,28 +592,22 @@ function renderCal(){
       return '<div class="ctag-wrap">'+
         '<div class="'+cls+'" style="background:'+hex2rgba(cat.color,0.15)+';color:'+cat.color+'" onclick="openCalModal(\''+key+'\')">'+(e.carried?'↩ ':e.repeat?'🔄 ':'')+e.text+'</div>'+
         '<div class="cal-order-btns">'+
-          '<button class="cal-order-btn" onclick="calMoveEntry(event,\''+key+'\','+i+',-1)" '+(isFirst?'disabled':'')+' title="위로">▲</button>'+
-          '<button class="cal-order-btn" onclick="calMoveEntry(event,\''+key+'\','+i+',1)" '+(isLast?'disabled':'')+' title="아래로">▼</button>'+
+          '<button class="cal-order-btn" onclick="calMoveEntry(event,\''+key+'\','+i+',-1)" '+(isFirst?'disabled':'')+'>▲</button>'+
+          '<button class="cal-order-btn" onclick="calMoveEntry(event,\''+key+'\','+i+',1)" '+(isLast?'disabled':'')+'>▼</button>'+
         '</div>'+
       '</div>'+img;
     }).join('');
     var dc=dow===0?'sun':dow===6?'sat':'';
-    // 날짜 클릭 시 모달 오픈 (태그 영역 제외)
     return '<div class="cal-cell'+(cell.cur?'':' other-month')+(isToday?' today':'')+'">'+'<div class="day-num '+dc+'" onclick="openCalModal(\''+key+'\')">'+cell.d+'</div>'+tags+'</div>';
   }).join('');
 }
-
-// 캘린더 셀에서 직접 순서 변경
 function calMoveEntry(event,key,i,dir){
   event.stopPropagation();
   var entries=getEntries(key);var j=i+dir;if(j<0||j>=entries.length)return;
   var tmp=entries[i];entries[i]=entries[j];entries[j]=tmp;
   saveEntries(key,entries);renderCal();
-  // 모달 열려있으면 같이 갱신
   if(openDateKey===key)renderEntries();
 }
-
-/* 드래그 순서변경 (사이드바) */
 function makeDraggable(el,idx,type){
   el.setAttribute('draggable','true');
   el.addEventListener('dragstart',function(e){dragSrcIdx=idx;dragSrcType=type;el.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
@@ -577,8 +622,6 @@ function makeDraggable(el,idx,type){
     dragSrcIdx=null;dragSrcType=null;
   });
 }
-
-/* 매달 루틴 */
 function renderRoutines(){
   var r=getRoutines();var remain=r.filter(function(x){return !x.done;}).length;
   document.getElementById('routine-badge').textContent=remain+'/'+r.length;
@@ -596,8 +639,6 @@ function startEditRoutine(i){editingRoutineIdx=i;renderRoutines();}
 function saveRoutineEdit(i){var inp=document.getElementById('redit_'+i);if(!inp)return;var v=inp.value.trim();if(v){var r=getRoutines();r[i].text=v;saveRoutines(r);}editingRoutineIdx=null;renderRoutines();}
 function addRoutine(){var inp=document.getElementById('routine-input');var v=inp.value.trim();if(!v)return;var r=getRoutines();r.push({text:v,done:false});saveRoutines(r);inp.value='';renderRoutines();}
 function delRoutine(i){var r=getRoutines();r.splice(i,1);saveRoutines(r);renderRoutines();}
-
-/* 리마인더 */
 function renderReminds(){
   var items=getReminds();var sorted=items.filter(function(r){return r.pinned;}).concat(items.filter(function(r){return !r.pinned;}));
   document.getElementById('remind-badge').textContent=items.length;
@@ -608,18 +649,16 @@ function renderReminds(){
     var bp=editingRemindIdx===ri
       ?'<textarea id="redit_remind_'+ri+'" onblur="saveRemindEdit('+ri+')" style="width:100%;border:1px solid #FFB74D;border-radius:4px;padding:4px;font-size:12px;color:#BF360C;font-family:inherit;resize:vertical;min-height:50px;background:#FFF3E0">'+r.text+'</textarea>'
       :'<div class="remind-text" ondblclick="startEditRemind('+ri+')" title="더블클릭=편집">'+r.text+'</div>';
-    return '<div class="remind-item'+(r.pinned?' pinned':'')+'" id="remind_item_'+ri+'"><span class="drag-handle" title="드래그로 순서변경">⠿</span>'+bp+'<button class="rdel" onclick="delRemind('+ri+')">✕</button><button class="rpin'+(r.pinned?' on':'')+'" onclick="togglePin('+ri+')">📌</button></div>';
+    return '<div class="remind-item'+(r.pinned?' pinned':'')+'" id="remind_item_'+ri+'"><span class="drag-handle">⠿</span>'+bp+'<button class="rdel" onclick="delRemind('+ri+')">✕</button><button class="rpin'+(r.pinned?' on':'')+'" onclick="togglePin('+ri+')">📌</button></div>';
   }).join('');
   sorted.forEach(function(r){var ri=items.indexOf(r);var el2=document.getElementById('remind_item_'+ri);if(el2)makeDraggable(el2,ri,'remind');});
-  if(editingRemindIdx!==null){var ta=document.getElementById('redit_remind_'+editingRemindIdx);if(ta){ta.focus();var l=ta.value.length;ta.setSelectionRange(l,l);}}
+  if(editingRemindIdx!==null){var ta=document.getElementById('redit_remind_'+editingRemindIdx);if(ta){ta.focus();}}
 }
 function startEditRemind(i){editingRemindIdx=i;renderReminds();}
 function saveRemindEdit(i){var ta=document.getElementById('redit_remind_'+i);if(!ta)return;var v=ta.value.trim();if(v){var r=getReminds();r[i].text=v;saveReminds(r);}editingRemindIdx=null;renderReminds();}
 function addRemind(){var inp=document.getElementById('remind-input');var v=inp.value.trim();if(!v)return;var r=getReminds();r.push({text:v,pinned:false});saveReminds(r);inp.value='';renderReminds();}
 function delRemind(i){var r=getReminds();r.splice(i,1);saveReminds(r);renderReminds();}
 function togglePin(i){var r=getReminds();r[i].pinned=!r[i].pinned;saveReminds(r);renderReminds();}
-
-/* 추후 할 일 */
 function renderTodoList(){
   var todos=getTodos();var remain=todos.filter(function(t){return !t.done;}).length;
   document.getElementById('todo-badge').textContent=remain+'/'+todos.length;
@@ -640,8 +679,6 @@ function addTodo(){var inp=document.getElementById('todo-input');var v=inp.value
 function toggleTodo(i){var t=getTodos();t[i].done=!t[i].done;saveTodos(t);renderTodoList();}
 function delTodo(i){var t=getTodos();t.splice(i,1);saveTodos(t);renderTodoList();}
 function carryTodo(i){var t=getTodos();var item=t[i];var ty=curYear,tm=curMonth+1;if(tm>11){tm=0;ty++;}var nf=dk(ty,tm,1);var entries=getEntries(nf);var dc=getCats()[0];entries.push({text:'[할 일 이월] '+item.text,catId:dc?dc.id:'c1',done:false,carried:true});saveEntries(nf,entries);sv('co_dismissed_'+ty+'-'+tm,true);alert(ty+'년 '+(tm+1)+'월로 이월했습니다.');renderCal();}
-
-/* 고정 */
 function renderFixed(){
   var items=getFixed();var el=document.getElementById('fixed-list');
   if(!items.length){el.innerHTML='<div style="font-size:12px;color:#81C784">고정 항목을 추가하세요.</div>';return;}
@@ -658,8 +695,6 @@ function toggleFixed(id){var items=getFixed();var i=items.findIndex(function(x){
 function delFixed(id){saveFixed(getFixed().filter(function(x){return x.id!==id;}));renderFixed();}
 function startEditFixed(id){editingFixedId=id;renderFixed();}
 function saveFixedEdit(id){var inp=document.getElementById('fedit_'+id);if(!inp)return;var v=inp.value.trim();if(v){var items=getFixed();var i=items.findIndex(function(x){return x.id===id;});if(i>=0)items[i].text=v;saveFixed(items);}editingFixedId=null;renderFixed();}
-
-/* 카테고리 */
 function renderCatList(){
   var cats=getCats();
   document.getElementById('cat-list').innerHTML=cats.map(function(c){
@@ -676,8 +711,6 @@ function updateCatColor(id,color){var cats=getCats();var c=cats.find(function(x)
 function addCat(){var name=document.getElementById('cat-name-input').value.trim();var color=document.getElementById('cat-color').value;if(!name)return;var cats=getCats();cats.push({id:'cat_'+Date.now(),name:name,color:color});saveCats(cats);document.getElementById('cat-name-input').value='';renderCatList();renderCatSelect();renderCal();}
 function delCat(id){var cats=getCats().filter(function(c){return c.id!==id;});saveCats(cats);renderCatList();renderCatSelect();renderCal();}
 function renderCatSelect(){var cats=getCats();var sel=document.getElementById('entry-cat');if(!sel)return;var cur=sel.value;sel.innerHTML=cats.map(function(c){return '<option value="'+c.id+'">'+c.name+'</option>';}).join('');if(cur)sel.value=cur;}
-
-/* 이월 */
 function checkCarryover(){
   var prevM=curMonth===0?11:curMonth-1, prevY=curMonth===0?curYear-1:curYear;
   var lastDate=new Date(prevY,prevM+1,0).getDate();var incomplete=[];
@@ -702,12 +735,14 @@ function carryoverFromModal(){
   incomplete.forEach(function(e){ne.push(Object.assign({},e,{carried:true,done:false}));});
   saveEntries(nf,ne);sv('co_dismissed_'+ty+'-'+tm,true);alert(ty+'년 '+(tm+1)+'월로 '+incomplete.length+'개 이월했습니다.');closeCalModalDirect();renderCal();
 }
-
-/* 검색 */
 function doSearch(){
   var q=document.getElementById('search-input').value.trim();if(!q)return;
   document.getElementById('clear-btn').style.display='flex';var results=[];
-  for(var k=0;k<localStorage.length;k++){var key=localStorage.key(k);if(!key||key.indexOf('je_')!==0)continue;try{JSON.parse(localStorage.getItem(key)).forEach(function(e){if(e.text&&e.text.indexOf(q)>=0)results.push({dateKey:key.replace('je_',''),text:e.text,catId:e.catId,done:e.done});});}catch(e){}}
+  Object.keys(cache).forEach(function(key){
+    if(key.indexOf('je_')!==0)return;
+    var arr=cache[key];if(!Array.isArray(arr))return;
+    arr.forEach(function(e){if(e.text&&e.text.indexOf(q)>=0)results.push({dateKey:key.replace('je_',''),text:e.text,catId:e.catId,done:e.done});});
+  });
   results.sort(function(a,b){return b.dateKey.localeCompare(a.dateKey);});
   document.getElementById('sr-panel').classList.add('open');
   document.getElementById('sr-title').textContent='"'+q+'" 검색 결과 — '+results.length+'건';
@@ -721,8 +756,6 @@ function doSearch(){
 }
 function clearSearch(){document.getElementById('search-input').value='';document.getElementById('sr-panel').classList.remove('open');document.getElementById('clear-btn').style.display='none';}
 function goToDate(dateKey){var parts=dateKey.split('-');curYear=parseInt(parts[0]);curMonth=parseInt(parts[1])-1;render();clearSearch();setTimeout(function(){openCalModal(dateKey);},100);}
-
-/* 날짜 모달 */
 function openCalModal(key){
   openDateKey=key;calImgData=null;editingEntryIdx=null;
   var parts=key.split('-');var y=parseInt(parts[0]),m=parseInt(parts[1]),d=parseInt(parts[2]);
@@ -741,17 +774,17 @@ function renderEntries(){
     var repeatBadge=e.repeat?'<span style="font-size:9px;background:#F3E5F5;color:#7B1FA2;border-radius:3px;padding:1px 4px;margin-left:3px;font-weight:600">🔄 '+(e.repeat==='monthly'?'매월':'매주')+'</span>':'';
     var isFirst=i===0,isLast=i===entries.length-1;
     if(editingEntryIdx===i){
-      return '<div class="ecard">'+'<div style="flex:1"><input class="entry-edit-input" id="entry_edit_inp" value="'+e.text.replace(/"/g,'&quot;')+'" onkeydown="if(event.key===\'Enter\')saveEntryEdit('+i+')"><div class="entry-edit-btns"><button class="entry-edit-save" onclick="saveEntryEdit('+i+')">저장</button><button class="entry-edit-cancel" onclick="cancelEntryEdit()">취소</button></div></div></div>';
+      return '<div class="ecard"><div style="flex:1"><input class="entry-edit-input" id="entry_edit_inp" value="'+e.text.replace(/"/g,'&quot;')+'" onkeydown="if(event.key===\'Enter\')saveEntryEdit('+i+')"><div class="entry-edit-btns"><button class="entry-edit-save" onclick="saveEntryEdit('+i+')">저장</button><button class="entry-edit-cancel" onclick="cancelEntryEdit()">취소</button></div></div></div>';
     }
     return '<div class="ecard'+(e.done?' done-card':'')+(e.repeat?' repeat-card':'')+'">'+
       '<div class="eleft"><input type="checkbox" class="eck" '+(e.done?'checked':'')+' onchange="toggleEntry('+i+')"><div>'+
         '<span style="font-size:10px;padding:1px 5px;border-radius:3px;display:inline-block;margin-bottom:3px;background:'+hex2rgba(cat.color,0.15)+';color:'+cat.color+'">'+cat.name+(e.carried?' · 이월':'')+repeatBadge+'</span>'+
         '<div class="etxt'+(e.done?' done':'')+'">'+e.text+'</div>'+imgEl+'</div></div>'+
       '<div class="ebtns">'+
-        '<button class="ebtn" onclick="moveEntry('+i+',-1)" '+(isFirst?'disabled':'')+' title="위로">▲</button>'+
-        '<button class="ebtn" onclick="moveEntry('+i+',1)" '+(isLast?'disabled':'')+' title="아래로">▼</button>'+
-        '<button class="ebtn" onclick="startEditEntry('+i+')" title="편집">✏️</button>'+
-        '<button class="ebtn del" onclick="delEntry('+i+')" title="삭제">🗑</button>'+
+        '<button class="ebtn" onclick="moveEntry('+i+',-1)" '+(isFirst?'disabled':'')+'>▲</button>'+
+        '<button class="ebtn" onclick="moveEntry('+i+',1)" '+(isLast?'disabled':'')+'>▼</button>'+
+        '<button class="ebtn" onclick="startEditEntry('+i+')">✏️</button>'+
+        '<button class="ebtn del" onclick="delEntry('+i+')">🗑</button>'+
       '</div>'+
     '</div>';
   }).join('');
@@ -787,15 +820,18 @@ function delEntry(i){
     if(choice){entries.splice(i,1);saveEntries(openDateKey,entries);}
     else{
       var rId=e.repeatId;saveRepeatRules(getRepeatRules().filter(function(r){return r.id!==rId;}));
-      for(var k=0;k<localStorage.length;k++){var key=localStorage.key(k);if(!key||key.indexOf('je_')!==0)continue;var arr=JSON.parse(localStorage.getItem(key)||'[]');var filtered=arr.filter(function(x){return x.repeatId!==rId;});if(filtered.length!==arr.length)sv(key,filtered);}
+      Object.keys(cache).forEach(function(key){
+        if(key.indexOf('je_')!==0)return;
+        var arr=cache[key];if(!Array.isArray(arr))return;
+        var filtered=arr.filter(function(x){return x.repeatId!==rId;});
+        if(filtered.length!==arr.length)sv(key,filtered);
+      });
     }
   } else {entries.splice(i,1);saveEntries(openDateKey,entries);}
   renderEntries();renderCal();
 }
 function closeCalModal(e){if(e.target===document.getElementById('cal-modal'))closeCalModalDirect();}
 function closeCalModalDirect(){document.getElementById('cal-modal').classList.remove('open');openDateKey=null;calImgData=null;editingEntryIdx=null;}
-
-/* 이미지 */
 function handleCalImgFile(e){var f=e.target.files[0];if(f)readImg(f,'cal');}
 function handleCalImgDrop(e){e.preventDefault();document.getElementById('cal-img-drop').classList.remove('drag');var f=e.dataTransfer.files[0];if(f&&f.type.indexOf('image/')===0)readImg(f,'cal');}
 function handleDiaryImgFile(e){var f=e.target.files[0];if(f)readImg(f,'diary');}
@@ -814,8 +850,6 @@ function readImg(f,target){
     };img.src=ev.target.result;
   };reader.readAsDataURL(f);
 }
-
-/* 다이어리 */
 function renderDiaryList(){
   var all=getDiaries();
   var filtered=all.filter(function(d){var dt=new Date(d.date);return dt.getFullYear()===diaryYear&&dt.getMonth()===diaryMonth;});
@@ -851,8 +885,6 @@ function saveDiaryEntry(){
 function deleteDiary(id){if(!confirm('이 메모를 삭제할까요?'))return;saveDiaries(getDiaries().filter(function(d){return d.id!==id;}));renderDiaryList();}
 function closeDiaryModal(e){if(e.target===document.getElementById('diary-modal'))closeDiaryModalDirect();}
 function closeDiaryModalDirect(){document.getElementById('diary-modal').classList.remove('open');editingDiaryId=null;}
-
-/* 태그 관리 */
 function openTagMgr(){renderTagMgrList();document.getElementById('tagmgr-modal').classList.add('open');}
 function closeTagMgr(e){if(e.target===document.getElementById('tagmgr-modal'))closeTagMgrDirect();}
 function closeTagMgrDirect(){document.getElementById('tagmgr-modal').classList.remove('open');editingTagId=null;renderDiaryTagSelect();}
@@ -869,8 +901,6 @@ function saveTagName(id){var inp=document.getElementById('tei_'+id);if(!inp)retu
 function updateTagColor(id,color){var tags=getDiaryTags();var t=tags.find(function(x){return x.id===id;});if(t)t.color=color;saveDiaryTags(tags);renderTagMgrList();}
 function addDiaryTag(){var name=document.getElementById('new-tag-name').value.trim();var color=document.getElementById('new-tag-color').value;if(!name)return;var tags=getDiaryTags();tags.push({id:'tag_'+Date.now(),name:name,color:color});saveDiaryTags(tags);document.getElementById('new-tag-name').value='';renderTagMgrList();}
 function delDiaryTag(id){if(getDiaryTags().length<=1){alert('태그는 최소 1개 이상 있어야 해요.');return;}saveDiaryTags(getDiaryTags().filter(function(t){return t.id!==id;}));renderTagMgrList();}
-
-render();
 </script>
 </body>
 </html>
