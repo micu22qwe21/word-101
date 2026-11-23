@@ -129,6 +129,28 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px
 .dact-btn:hover{background:#f0f0f0;color:#333}
 .diary-card-body{padding:12px 14px;font-size:13px;color:#222;line-height:1.8;white-space:pre-wrap;border-top:1px solid #e5e5e5}
 .diary-card-img{width:100%;max-height:200px;object-fit:cover;border-top:1px solid #e5e5e5;display:block}
+.tab-btn.active-all{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.all-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.seg{display:inline-flex;border:1px solid #ddd;border-radius:8px;overflow:hidden}
+.seg button{background:#fff;border:none;padding:6px 12px;font-size:12px;cursor:pointer;color:#666;font-family:inherit}
+.seg button+button{border-left:1px solid #ddd}
+.seg button.on{background:#1D9E75;color:#fff;font-weight:600}
+.all-search{border:1px solid #ddd;border-radius:8px;padding:6px 10px;font-size:12px;width:170px;font-family:inherit}
+.all-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.all-chip{font-size:11px;padding:4px 10px;border-radius:14px;border:1px solid #ddd;background:#fff;color:#666;cursor:pointer;font-family:inherit}
+.all-chip.on{color:#fff}
+.all-summary{font-size:12px;color:#888;margin-bottom:12px}
+.all-month-head{font-size:15px;font-weight:800;color:#000;margin:22px 0 10px;padding-bottom:6px;border-bottom:2px solid #1D9E75;display:flex;justify-content:space-between;align-items:baseline}
+.all-month-head:first-child{margin-top:4px}
+.all-count{font-size:11px;font-weight:500;color:#999}
+.all-cat-head{display:flex;align-items:center;gap:8px;margin:22px 0 10px;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;user-select:none}
+.all-cat-head:first-child{margin-top:4px}
+.all-cat-head .arrow{margin-left:auto;font-size:11px;transition:transform .15s}
+.all-cat-head.closed .arrow{transform:rotate(-90deg)}
+.all-date-chip{font-size:11px;font-weight:700;color:#333;background:#f0f0f0;border-radius:10px;padding:2px 9px}
+.diary-card-body.clamp{max-height:9em;overflow:hidden;position:relative;cursor:pointer}
+.diary-card-body.clamp:after{content:'더보기 ▾';position:absolute;right:0;bottom:0;left:0;text-align:right;padding:18px 14px 6px;font-size:11px;color:#1D9E75;background:linear-gradient(rgba(255,255,255,0),#fff 60%)}
+@media(max-width:640px){.topbar{flex-wrap:wrap}.topbar>div:last-child{width:100%;justify-content:flex-end}.page-tabs{flex-wrap:wrap}.tab-btn{padding:6px 9px}}
 .diary-empty{text-align:center;padding:50px 20px;color:#aaa;font-size:13px;line-height:2}
 .dtag-row{display:flex;align-items:center;gap:5px;padding:4px 0}
 .dtag-name-span{font-size:12px;flex:1;cursor:pointer;padding:1px 3px;border-radius:3px}
@@ -205,6 +227,7 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
     <div class="page-tabs">
       <button class="tab-btn active-cal" id="tab-cal" onclick="switchPage('cal')"><span class="tab-dot" style="background:#D4537E"></span>업무일지</button>
       <button class="tab-btn" id="tab-diary" onclick="switchPage('diary')"><span class="tab-dot" style="background:#378ADD"></span>다이어리</button>
+      <button class="tab-btn" id="tab-all" onclick="switchPage('all')"><span class="tab-dot" style="background:#1D9E75"></span>전체 다이어리</button>
     </div>
   </div>
 </div>
@@ -296,6 +319,25 @@ textarea.finp{resize:vertical;line-height:1.7;min-height:150px}
       </div>
     </div>
     <div id="diary-list"></div>
+  </div>
+</div>
+
+<div class="page" id="page-all">
+  <div class="diary-page">
+    <div class="all-toolbar">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span class="diary-month-title">📚 전체 다이어리</span>
+        <div class="seg"><button id="av-time" class="on" onclick="setAllView('time')">🕒 시간순</button><button id="av-cat" onclick="setAllView('cat')">🏷 카테고리별</button></div>
+        <div class="seg"><button id="ao-desc" class="on" onclick="setAllOrder('desc')">최신순</button><button id="ao-asc" onclick="setAllOrder('asc')">오래된순</button></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" class="all-search" id="all-search" placeholder="내용 검색..." oninput="renderAllDiary()">
+        <button class="new-diary-btn" style="background:#1D9E75" onclick="openDiaryModal()">+ 새 메모</button>
+      </div>
+    </div>
+    <div class="all-chips" id="all-chips"></div>
+    <div class="all-summary" id="all-summary"></div>
+    <div id="all-list"></div>
   </div>
 </div>
 
@@ -442,6 +484,7 @@ db.ref('ward101').on('value', function(snapshot) {
   dbReady = true;
   setSyncStatus('synced');
   render();
+  refreshAllDiary();
 }, function(error) {
   setSyncStatus('error');
   // Firebase 오류시 localStorage로 폴백
@@ -511,9 +554,11 @@ function switchPage(page){
   document.getElementById('page-'+page).classList.add('active');
   document.getElementById('tab-cal').className='tab-btn'+(page==='cal'?' active-cal':'');
   document.getElementById('tab-diary').className='tab-btn'+(page==='diary'?' active-diary':'');
+  document.getElementById('tab-all').className='tab-btn'+(page==='all'?' active-all':'');
   document.getElementById('search-area').style.display=page==='cal'?'flex':'none';
   document.getElementById('cal-nav').style.display=page==='cal'?'flex':'none';
   if(page==='diary'){renderDiaryList();renderDiaryTagSelect();}
+  if(page==='all'){renderAllDiary();renderDiaryTagSelect();}
 }
 function updateTitle(){
   document.getElementById('topbar-title').textContent=curYear+'년 '+MONTHS[curMonth]+' 업무일지';
@@ -867,6 +912,66 @@ function renderDiaryList(){
     return '<div class="diary-date-group"><div class="diary-date-header"><span class="diary-date-label">📅 '+dl+'</span><div class="diary-date-line"></div></div>'+cards+'</div>';
   }).join('');
 }
+// ========== 전체 다이어리 ==========
+var allView='time', allOrder='desc', allTagFilter='all', allClosedCats={};
+function setAllView(v){allView=v;document.getElementById('av-time').className=v==='time'?'on':'';document.getElementById('av-cat').className=v==='cat'?'on':'';renderAllDiary();}
+function setAllOrder(o){allOrder=o;document.getElementById('ao-desc').className=o==='desc'?'on':'';document.getElementById('ao-asc').className=o==='asc'?'on':'';renderAllDiary();}
+function setAllTag(id){allTagFilter=id;renderAllDiary();}
+function toggleAllCat(id){allClosedCats[id]=!allClosedCats[id];renderAllDiary();}
+function refreshAllDiary(){var p=document.getElementById('page-all');if(p&&p.classList.contains('active'))renderAllDiary();}
+function escHtml(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function parseYmd(s){var a=(s||'').split('-');return new Date(+a[0],(+a[1]||1)-1,+a[2]||1);}
+function fmtDateLabel(s){var dt=parseYmd(s);return (dt.getMonth()+1)+'월 '+dt.getDate()+'일 ('+DAYS[dt.getDay()]+')';}
+function allCardHtml(d,showTag,showDate){
+  var tag=getTagById(d.tagId);
+  var meta=(showDate?'<span class="all-date-chip">'+d.date.slice(0,4)+'. '+fmtDateLabel(d.date)+'</span>':'')+
+    (showTag?'<span class="diary-tag-pill" style="background:'+hex2rgba(tag.color,0.15)+';color:'+tag.color+'">'+escHtml(tag.name)+'</span>':'');
+  var body=String(d.content||'');var long=body.split('\n').length>6||body.length>300;
+  var imgEl=d.img?'<img src="'+d.img+'" class="diary-card-img" alt="첨부이미지">':'';
+  return '<div class="diary-card"><div class="diary-card-header"><div class="diary-card-meta">'+meta+'</div><div class="diary-card-acts"><button class="dact-btn" onclick="openDiaryModal(\''+d.id+'\')">✏️</button><button class="dact-btn" onclick="deleteDiary(\''+d.id+'\')">🗑️</button></div></div><div class="diary-card-body'+(long?' clamp':'')+'" onclick="this.classList.remove(\'clamp\')">'+escHtml(body)+'</div>'+imgEl+'</div>';
+}
+function renderAllDiary(){
+  var tags=getDiaryTags();var all=getDiaries().slice();
+  var q=(document.getElementById('all-search').value||'').trim().toLowerCase();
+  var counts={};all.forEach(function(d){counts[d.tagId]=(counts[d.tagId]||0)+1;});
+  // 칩
+  var chips='<button class="all-chip'+(allTagFilter==='all'?' on':'')+'" style="'+(allTagFilter==='all'?'background:#333;border-color:#333':'')+'" onclick="setAllTag(\'all\')">전체 '+all.length+'</button>';
+  chips+=tags.map(function(t){var on=allTagFilter===t.id;return '<button class="all-chip'+(on?' on':'')+'" style="'+(on?'background:'+t.color+';border-color:'+t.color:'border-color:'+hex2rgba(t.color,0.5)+';color:'+t.color)+'" onclick="setAllTag(\''+t.id+'\')">'+escHtml(t.name)+' '+(counts[t.id]||0)+'</button>';}).join('');
+  document.getElementById('all-chips').innerHTML=chips;
+  // 필터
+  var list=all.filter(function(d){
+    if(allTagFilter!=='all'&&d.tagId!==allTagFilter)return false;
+    if(q&&String(d.content||'').toLowerCase().indexOf(q)<0)return false;return true;});
+  var dir=allOrder==='desc'?-1:1;
+  list.sort(function(a,b){var c=(a.date||'').localeCompare(b.date||'');if(!c)c=String(a.id).localeCompare(String(b.id));return c*dir;});
+  var el=document.getElementById('all-list');
+  if(list.length){var ds=list.map(function(d){return d.date;}).sort();var f=ds[0],l=ds[ds.length-1];
+    document.getElementById('all-summary').textContent='총 '+list.length+'개 메모 · '+f.replace(/-/g,'.')+' ~ '+l.replace(/-/g,'.');}
+  else document.getElementById('all-summary').textContent='';
+  if(!list.length){el.innerHTML='<div class="diary-empty">📓 조건에 맞는 메모가 없어요.</div>';return;}
+  var html='';
+  if(allView==='time'){
+    var months=[],mg={};
+    list.forEach(function(d){var k=d.date.slice(0,7);if(!mg[k]){mg[k]=[];months.push(k);}mg[k].push(d);});
+    html=months.map(function(k){
+      var items=mg[k];var dates=[],dg={};
+      items.forEach(function(d){if(!dg[d.date]){dg[d.date]=[];dates.push(d.date);}dg[d.date].push(d);});
+      return '<div class="all-month-head"><span>'+k.slice(0,4)+'년 '+(+k.slice(5,7))+'월</span><span class="all-count">'+items.length+'개</span></div>'+
+        dates.map(function(dt){return '<div class="diary-date-group"><div class="diary-date-header"><span class="diary-date-label">📅 '+fmtDateLabel(dt)+'</span><div class="diary-date-line"></div></div>'+
+          dg[dt].map(function(d){return allCardHtml(d,true,false);}).join('')+'</div>';}).join('');
+    }).join('');
+  }else{
+    var order=tags.map(function(t){return t.id;});var cg={};
+    list.forEach(function(d){var id=order.indexOf(d.tagId)>=0?d.tagId:'__none';if(!cg[id])cg[id]=[];cg[id].push(d);});
+    if(cg.__none)order.push('__none');
+    html=order.filter(function(id){return cg[id];}).map(function(id){
+      var t=id==='__none'?{name:'미분류',color:'#888780'}:getTagById(id);var closed=!!allClosedCats[id];
+      return '<div class="all-cat-head'+(closed?' closed':'')+'" style="background:'+hex2rgba(t.color,0.12)+';color:'+t.color+'" onclick="toggleAllCat(\''+id+'\')">🏷 '+escHtml(t.name)+' <span class="all-count">'+cg[id].length+'개</span><span class="arrow">▼</span></div>'+
+        (closed?'':cg[id].map(function(d){return allCardHtml(d,false,true);}).join(''));
+    }).join('');
+  }
+  el.innerHTML=html;
+}
 function renderDiaryTagSelect(){var tags=getDiaryTags();var sel=document.getElementById('diary-tag');if(!sel)return;var cur=sel.value;sel.innerHTML=tags.map(function(t){return '<option value="'+t.id+'">'+t.name+'</option>';}).join('');if(cur)sel.value=cur;}
 function openDiaryModal(id){
   editingDiaryId=id||null;diaryImgData=null;renderDiaryTagSelect();
@@ -880,14 +985,14 @@ function saveDiaryEntry(){
   var diaries=getDiaries();var entry={date:date,tagId:tagId,content:content,img:diaryImgData||null};
   if(editingDiaryId){var i=diaries.findIndex(function(d){return d.id===editingDiaryId;});if(i>=0)diaries[i]=Object.assign({},diaries[i],entry);}
   else diaries.push(Object.assign({id:'d_'+Date.now()},entry));
-  saveDiaries(diaries);closeDiaryModalDirect();renderDiaryList();
+  saveDiaries(diaries);closeDiaryModalDirect();renderDiaryList();refreshAllDiary();
 }
-function deleteDiary(id){if(!confirm('이 메모를 삭제할까요?'))return;saveDiaries(getDiaries().filter(function(d){return d.id!==id;}));renderDiaryList();}
+function deleteDiary(id){if(!confirm('이 메모를 삭제할까요?'))return;saveDiaries(getDiaries().filter(function(d){return d.id!==id;}));renderDiaryList();refreshAllDiary();}
 function closeDiaryModal(e){if(e.target===document.getElementById('diary-modal'))closeDiaryModalDirect();}
 function closeDiaryModalDirect(){document.getElementById('diary-modal').classList.remove('open');editingDiaryId=null;}
 function openTagMgr(){renderTagMgrList();document.getElementById('tagmgr-modal').classList.add('open');}
 function closeTagMgr(e){if(e.target===document.getElementById('tagmgr-modal'))closeTagMgrDirect();}
-function closeTagMgrDirect(){document.getElementById('tagmgr-modal').classList.remove('open');editingTagId=null;renderDiaryTagSelect();}
+function closeTagMgrDirect(){document.getElementById('tagmgr-modal').classList.remove('open');editingTagId=null;renderDiaryTagSelect();refreshAllDiary();}
 function renderTagMgrList(){
   var tags=getDiaryTags();
   document.getElementById('tagmgr-list').innerHTML=tags.map(function(t){
